@@ -36,7 +36,7 @@
       <div class="bg-light-blue br3 h-auto pa3 f4 lh-copy">
         {{detectedText}}
       </div>
-      <button class="bg-black pa3 mv4 link dim br2 pointer ba b--black dib white">Copy to clipboard</button>
+      <button class="bg-black pa3 mv4 link dim br2 pointer ba b--black dib white" @click="copyText">{{shareText}}</button>
     </section>
   </div>
 </template>
@@ -56,7 +56,8 @@ export default {
       ocr: 'adv_ocr',
       preset: "eupk2nrn",
       cloudName: 'moerayo',
-      detectedText: ''
+      detectedText: '',
+      shareText: 'Copy Text'
     }
   },
   computed: {
@@ -131,6 +132,12 @@ export default {
         return error
       })
     },
+    copyText(){
+      navigator.clipboard
+      .writeText(this.detectedText)
+      .then(() => (this.shareText = 'Copied!'))
+      .catch((err) => err)
+    }
   },
   mounted() {
     this.reset();
