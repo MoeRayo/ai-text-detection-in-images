@@ -18,23 +18,23 @@
       <!--upload successful-->
       <div v-if="isSuccess">
         <h2>File upload is successful.</h2>
-        <button @click="reset()" class="bg-light-purple pa3 mv4 link dim br2 pointer ba b--light-blue dib white">Upload again</button>
+        <button @click.prevent="reset()" class="bg-light-purple pa3 mv4 link dim br2 pointer ba b--light-blue dib white">Upload again</button>
         <div v-for="item in uploadedFiles">
           <img :src="item.url" :alt="item.originalName">
         </div>
-         <button class="bg-light-blue pa3 mv4 link dim br2 pointer ba b--light-blue dib">Extract Text</button>
+         <button @click.prevent="detectText" class="bg-light-blue pa3 mv4 link dim br2 pointer ba b--light-blue dib">Extract Text</button>
       </div>
       <!--upload failed-->
       <div v-if="isFailed">
         <h2>Uploaded failed.</h2>
-          <button @click="reset()">Try again</button>
+          <button @click.prevent="reset()">Try again</button>
         <pre>{{ uploadError }}</pre>
       </div>
     </div>
     <section class="w-40-l w-50-m w-100 ph3">
       <h2>Extracted Text</h2>
       <div class="bg-light-blue br3 h-auto pa3 f4 lh-copy">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid architecto nemo nesciunt magni ad hic accusamus debitis cum doloribus laboriosam quod ipsam natus dolorum minima, dolorem rerum praesentium atque? Deserunt?
+        {{detectedText}}
       </div>
       <button class="bg-black pa3 mv4 link dim br2 pointer ba b--black dib white">Copy to clipboard</button>
     </section>
@@ -53,6 +53,10 @@ export default {
       uploadError: null,
       currentStatus: null,
       uploadFieldName: 'photos',
+      ocr: 'adv_ocr',
+      preset: "eupk2nrn",
+      cloudName: 'moerayo',
+      detectedText: ''
     }
   },
   computed: {
@@ -80,7 +84,7 @@ export default {
       // upload data to the server
       this.currentStatus = STATUS_SAVING;
       upload(formData)
-      .then(wait(1500)) // wait for 1.5s
+      .then(wait(2000)) //delaying the promise
       .then(x => {
         this.uploadedFiles = [].concat(x);
         this.currentStatus = STATUS_SUCCESS;
@@ -102,7 +106,31 @@ export default {
         });
       // save it
       this.save(formData);
-    }
+    },
+    prepareFormData() {
+      this.newFormData = new FormData();
+      this.newFormData.append("upload_preset", this.preset);
+      this.newFormData.append("file", this.uploadedFiles[0].url);
+    },
+    detectText(){
+      this.prepareFormData();
+      const cloudinaryUploadURL = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
+      const requestObj = {
+        url: cloudinaryUploadURL,
+        method: "POST",
+        data: this.newFormData,
+      };
+      this.$axios(requestObj)
+      .then(response => {
+        this.results = response.data;
+        const { textAnnotations } = response.data.info.ocr.adv_ocr.data[0]
+        const extractedText = textAnnotations.map((anno, i) => i > 0 && anno.description.replace(/[^0-9a-z]/gi, '')).filter((entry) => typeof entry === 'string').join(' ');
+          this.detectedText = extractedText
+        })
+        .catch(error => {
+        return error
+      })
+    },
   },
   mounted() {
     this.reset();
