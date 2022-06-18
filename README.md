@@ -18,3 +18,5 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+
+_NB: Endeavour to replace all occurrences of "***" with the appropriate values._
