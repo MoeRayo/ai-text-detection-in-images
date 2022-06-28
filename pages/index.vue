@@ -7,17 +7,17 @@
         <div class="b--dashed bw1 b--light-purple pa3 hover-bg-black-10 bg-animate pointer relative h4">
           <input type="file" accept="image/*" :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length" class="input-file absolute w-100 h4 pointer o-0">
           <p  v-if="isInitial" class="tc f4">
-            Drag your file here to begin<br> or click to browse
+            Drag your image here to begin<br> or click to browse
           </p>
           <p v-if="isSaving" class="tc f4">
-            Uploading file...
+            Uploading image...
           </p>
         </div>
        
       </form>
       <!--upload successful-->
       <div v-if="isSuccess">
-        <h2>File upload is successful.</h2>
+        <h2>Image upload is successful.</h2>
         <button @click.prevent="reset()" class="bg-light-purple pa3 mv4 link dim br2 pointer ba b--light-blue dib white">Upload again</button>
         <div v-for="item in uploadedFiles">
           <img :src="item.url" :alt="item.originalName">
