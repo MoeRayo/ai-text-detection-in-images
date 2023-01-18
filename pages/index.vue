@@ -54,8 +54,8 @@ export default {
       currentStatus: null,
       uploadFieldName: 'photos',
       ocr: 'adv_ocr',
-      preset: "***",
-      cloudName: '***',
+      preset: "eupk2nrn",
+      cloudName: 'moerayo',
       detectedText: '',
       shareText: 'Copy Text'
     }
